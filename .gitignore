@@ -1,0 +1,7 @@
+output-*
+packer_cache
+log/*
+install*
+miniroot*
+tmp
+*.iso
