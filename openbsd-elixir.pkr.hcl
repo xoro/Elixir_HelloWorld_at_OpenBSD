@@ -20,6 +20,10 @@ variable "packer-vnc-port" {
   type    = string
   default = "5987"
 }
+variable "use-openbsd-snapshot" {
+  type    = bool
+  default = "false"
+}
 variable "openbsd-install-img" {
   type    = string
   default = "install72.img"
@@ -45,9 +49,11 @@ variable "rc-firsttime-wait" {
 variable "elixir-env-vars" {
   type = list(string)
   default = [
-    "MIX_ENV=dev",
+    "MIX_ENV=prod",
     "LANG=en_US.UTF-8",
     "LC_ALL=en_US.UTF-8",
+    "SECRET_KEY_BASE=asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfadsfasdfasdfasdfasdasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf",
+    "DATABASE_URL=ecto://postgres@localhost/hello_prod",
   ]
 }
 
@@ -103,6 +109,7 @@ source "vmware-iso" "openbsd-elixir" {
   boot_wait = "${var.packer-boot-wait}s"
   boot_command = [
     "install<return><wait2s>",
+    "us<return><wait2s>",
     "${var.openbsd-hostname}<return><wait2s>",
     "<return><wait2s>",
     "autoconf<return><wait5s>",
@@ -148,10 +155,11 @@ build {
   # Upgrade the system to the latest patch level
   provisioner "shell" {
     expect_disconnect = "true"
-    inline = [
-      "doas syspatch",
-      "doas shutdown -r now",
-    ]
+    inline = concat(
+      # Only execute the syspatch if we are not using the OpenBSD snapshot.
+      [for command in ["doas syspatch"] : command if !var.use-openbsd-snapshot],
+      ["doas shutdown -r now"]
+    )
   }
   # Install required packages and configure/bring up postgresql
   provisioner "shell" {
@@ -170,8 +178,9 @@ build {
       "mix local.rebar --force",
       "mix archive.install --force hex phx_new",
       "echo yes | mix phx.new hello",
-      "cd $HOME/hello && sed -i 's|\\[:gettext\\]|\\[\\]|g' mix.exs  && mix compile && mix ecto.create && tmux new-session -d -s openbsd-elixir 'mix phx.server'",
-      "sleep 10 && curl http://localhost:4000",
+      "cd $HOME/hello && sed -i 's|\\[:gettext\\]|\\[\\]|g' mix.exs && mix compile && mix ecto.create && mix phx.digest && tmux new-session -d -s openbsd-elixir 'mix phx.server'",
+      "sleep 10",
+      "curl --silent http://localhost:4000 | grep '<h1>Welcome to Phoenix!</h1>'",
     ]
   }
   # After finishing the setup we copy the system log locally.
