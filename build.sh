@@ -18,6 +18,7 @@ packer_config_file_name="openbsd-elixir.pkr.hcl"
 # Variables passed to packer
 packer_boot_wait="25"             # The time (in seconds) packer waits to proceed after the VM has been initially booted
 packer_ssh_host="openbsd-elixir"  # Can be an IP address or a resolvable FQDN
+#packer_ssh_host="192.168.254.220"  # Can be an IP address or a resolvable FQDN
 packer_vnc_port="5987"            # The VNC port packer will use for the vm configuration
 openbsd_hostname="openbsd-elixir" # The hostname inside the VM
 openbsd_username="user"           # The user (and password) that is created during the installation process
