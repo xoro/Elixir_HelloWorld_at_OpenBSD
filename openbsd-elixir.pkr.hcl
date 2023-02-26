@@ -52,7 +52,7 @@ variable "elixir-env-vars" {
     "MIX_ENV=prod",
     "LANG=en_US.UTF-8",
     "LC_ALL=en_US.UTF-8",
-    "SECRET_KEY_BASE=asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfadsfasdfasdfasdfasdasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf",
+    "SECRET_KEY_BASE=12345678901234567890123456789012345678901234567890123456789012345",
     "DATABASE_URL=ecto://postgres@localhost/hello_prod",
   ]
 }
@@ -178,9 +178,9 @@ build {
       "mix local.rebar --force",
       "mix archive.install --force hex phx_new",
       "echo yes | mix phx.new hello",
-      "cd $HOME/hello && sed -i 's|\\[:gettext\\]|\\[\\]|g' mix.exs && mix compile && mix ecto.create && mix phx.digest && tmux new-session -d -s openbsd-elixir 'mix phx.server'",
+      "cd $HOME/hello && mix compile && mix ecto.create && mix phx.digest && tmux new-session -d -s openbsd-elixir 'mix phx.server'",
       "sleep 10",
-      "curl --silent http://localhost:4000 | grep '<h1>Welcome to Phoenix!</h1>'",
+      "curl --silent http://localhost:4000 | grep 'Peace of mind from prototype to production.'",
     ]
   }
   # After finishing the setup we copy the system log locally.
