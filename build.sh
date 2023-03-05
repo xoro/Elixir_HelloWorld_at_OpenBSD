@@ -10,7 +10,7 @@ export fmt_end="\e[0m"
 export PACKER_LOG="1"
 export PACKER_LOG_PATH="log/packer.log"
 # Variables used in this script
-openbsd_version_long="7.2"
+openbsd_version_long="7.3"
 openbsd_version_short="$(echo "${openbsd_version_long}" | tr -d .)"
 use_openbsd_snapshot="true" # If you use the latest development snapshot make sure to set the version to the current released verison number.
 max_tries_port_check="120"
