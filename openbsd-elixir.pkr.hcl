@@ -58,53 +58,40 @@ variable "elixir-env-vars" {
 }
 
 source "vmware-iso" "openbsd-elixir" {
-  version = "20"
-  iso_url = "./empty.iso"
-  iso_checksum = "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-  ssh_username = "user"
-  ssh_password = "user"
-  ssh_host = "${var.packer-ssh-host}"
-  vnc_port_min = "${var.packer-vnc-port}"
-  vnc_port_max = "${var.packer-vnc-port}"
+  version              = "20"
+  iso_url              = "./empty.iso"
+  iso_checksum         = "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ssh_username         = "user"
+  ssh_password         = "user"
+  vnc_port_min         = "${var.packer-vnc-port}"
+  vnc_port_max         = "${var.packer-vnc-port}"
   vnc_disable_password = "true"
-  shutdown_command = "doas /sbin/shutdown -p now"
-  keep_registered  = "false"
-  skip_export = "false"
-  headless = "true"
-  format = "vmx"
-  cpus = "8"
-  memory = "4096"
-  disk_adapter_type = "nvme"
-  disk_size = "65535"
-  disk_type_id = "0"
+  shutdown_command     = "doas /sbin/shutdown -p now"
+  keep_registered      = "false"
+  skip_export          = "false"
+  headless             = "true"
+  format               = "vmx"
+  cpus                 = "8"
+  memory               = "4096"
+  disk_adapter_type    = "nvme"
+  disk_size            = "65535"
+  disk_type_id         = "0"
   network_adapter_type = "e1000e"
-  usb = "true"
-  guest_os_type = "arm-other-64"
+  usb                  = "true"
+  guest_os_type        = "arm-other-64"
   vmx_data = {
     # Nothing is working without EFI!!! ;-)
-    "firmware" = "efi"
+    "firmware"     = "efi"
     "architecture" = "arm-other-64"
     # We need the USB stuff for packer to type text.
     "usb_xhci.present" = "TRUE"
     # We have to add the vmdk converted OpenBSD install image file,
-    "nvme0.present" = "TRUE"
+    "nvme0.present"    = "TRUE"
     "nvme0:1.fileName" = "${var.openbsd-install-img}"
-    "nvme0:1.present" = "TRUE"
+    "nvme0:1.present"  = "TRUE"
     # and make sure to boot from it.
     "bios.bootOrder" = "HDD"
-    "bios.hddOrder" = "nvme0:1"
-    # We are using a custom bridge network config,
-    # because the download of the OpenBSD packages via NAT is extremely slow!!!
-    "ethernet0.addresstype" = "static"
-    "ethernet0.generatedaddressoffset" = "0"
-    "ethernet0.bsdname" = "en0" # en0 on MacBooks is usually the Wifi interface
-    "ethernet0.connectiontype" = "custom"
-    "ethernet0.linkstatepropagation.enable" = "TRUE"
-    "ethernet0.pcislotnumber" = "160"
-    "ethernet0.present" = "TRUE"
-    "ethernet0.vnet" = "vmnet3"
-    "ethernet0.wakeonpcktrcv" = "FALSE"
-    "ethernet0.address" = "00:0c:29:49:a7:53"
+    "bios.hddOrder"  = "nvme0:1"
   }
   boot_wait = "${var.packer-boot-wait}s"
   boot_command = [
@@ -165,7 +152,8 @@ build {
   provisioner "shell" {
     pause_before     = "10s"
     inline = [
-      "doas pkg_add elixir postgresql-server curl",
+      # https://developer.hashicorp.com/terraform/language/expressions/conditionals
+      "doas pkg_add -D snapshot elixir postgresql-server curl",
       "cd /var/postgresql/ && doas su _postgresql -c \"initdb --pgdata=/var/postgresql/data/ --username=postgres --encoding=UTF-8 --locale=en_US.UTF-8\"",
       "doas rcctl enable postgresql && doas rcctl start postgresql",
     ]
