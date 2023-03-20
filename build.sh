@@ -13,17 +13,13 @@ export PACKER_LOG_PATH="log/packer.log"
 openbsd_version_long="7.3"
 openbsd_version_short="$(echo "${openbsd_version_long}" | tr -d .)"
 use_openbsd_snapshot="true" # If you use the latest development snapshot make sure to set the version to the current released verison number.
-max_tries_port_check="120"
 packer_config_file_name="openbsd-elixir.pkr.hcl"
 # Variables passed to packer
-packer_boot_wait="25"             # The time (in seconds) packer waits to proceed after the VM has been initially booted
-packer_ssh_host="openbsd-elixir"  # Can be an IP address or a resolvable FQDN
-#packer_ssh_host="192.168.254.220"  # Can be an IP address or a resolvable FQDN
-packer_vnc_port="5987"            # The VNC port packer will use for the vm configuration
-openbsd_hostname="openbsd-elixir" # The hostname inside the VM
-openbsd_username="user"           # The user (and password) that is created during the installation process
-openbsd_excluded_sets="-g* -x*"   # The sets that can be selected/deselected
-rc_firsttime_wait="100"           # If you have a slow internet connection you can increase this time (in seconds)
+packer_boot_wait="25"               # The time (in seconds) packer waits to proceed after the VM has been initially booted
+openbsd_hostname="openbsd-elixir"   # The hostname inside the VM
+openbsd_username="user"             # The user (and password) that is created during the installation process
+openbsd_excluded_sets="-g* -m* -x*" # The sets that can be selected/deselected
+rc_firsttime_wait="100"             # If you have a slow internet connection you can increase this time (in seconds)
 # Default values for command line options
 #default_answer_yes="1"
 
@@ -143,41 +139,6 @@ then
     fi
 else
     printf "%b %bINFO:%b  There is no running vmware-vmx process related to this script.\n\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
-fi
-
-printf "################################################################################\n"
-printf "# Checking if no process is using the TCP port localhost:%b\n" "${packer_vnc_port}"
-printf "################################################################################\n"
-i=0
-while [ "${i}" -lt "${max_tries_port_check}" ]
-do
-    checked_ports=$(netstat -lnv | grep "127.0.0.1.${packer_vnc_port}" && (lsof -i -P 2>/dev/null | grep "localhost:${packer_vnc_port}"))
-    if [ "${checked_ports}" = "" ]
-    then
-        if [ "${i}" != "0" ]
-        then
-            printf "\n"
-        fi
-        break
-    fi
-    if [ "${i}" = "0" ]
-    then
-        printf "%b %bINFO:%b  Please make sure that all packer and VNC Viewer processes are closed.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
-        printf "%b %bINFO:%b  ." "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
-    else
-        printf "."
-    fi
-    i=$(( i + 1 ))
-    sleep 1
-done
-if [ "${i}" -lt "${max_tries_port_check}" ]
-then
-    printf "%b %bINFO:%b  There are no running packer and VNC Viewer processes anymore.\n\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
-else
-    printf "\n"
-    printf "%b %bERROR:%b There are running processes that are using the port %b.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}" "${packer_vnc_port}"
-    printf "%b %bERROR:%b Please make sure that all packer and VNC Viewer processes are closed.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
-    exit 1
 fi
 
 printf "################################################################################\n"
@@ -306,13 +267,10 @@ printf "%b %bINFO:%b  packer was successfully initialized.\n\n" "$(date "+%Y-%m-
 
 printf "################################################################################\n"
 printf "# Installing OpenBSD in VMWare Fuison (this can take several minutes)\n"
-printf "# Follow the VM creation: vnc://127.0.0.1:%b\n" "${packer_vnc_port}"
 printf "################################################################################\n"
 if ! packer build -force \
                   -on-error=abort \
                   -var packer-boot-wait="${packer_boot_wait}" \
-                  -var packer-ssh-host="${packer_ssh_host}" \
-                  -var packer-vnc-port="${packer_vnc_port}" \
                   -var use-openbsd-snapshot="${use_openbsd_snapshot}" \
                   -var openbsd-install-img="$(pwd)"/install"${openbsd_version_short}".vmdk \
                   -var openbsd-hostname="${openbsd_hostname}" \
