@@ -152,8 +152,7 @@ build {
   provisioner "shell" {
     pause_before     = "10s"
     inline = [
-      # https://developer.hashicorp.com/terraform/language/expressions/conditionals
-      "doas pkg_add -D snapshot elixir postgresql-server curl",
+      "doas pkg_add ${var.use-openbsd-snapshot == "false" ? "" : "-D snapshot "}elixir postgresql-server curl",
       "cd /var/postgresql/ && doas su _postgresql -c \"initdb --pgdata=/var/postgresql/data/ --username=postgres --encoding=UTF-8 --locale=en_US.UTF-8\"",
       "doas rcctl enable postgresql && doas rcctl start postgresql",
     ]

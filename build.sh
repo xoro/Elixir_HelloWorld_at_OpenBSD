@@ -30,14 +30,14 @@ rc_firsttime_wait="100"           # If you have a slow internet connection you c
 check_openbsd_install_image ()
 {
     # We check if the user wants to use the latest development snapshot
-    if [ "${use_openbsd_snapshot}" = "true" ];
+    if [ "${use_openbsd_snapshot}" = "true" ]
     then
         url_path="snapshots"
     else
         url_path="${openbsd_version_long}"
     fi
     # Check if the OpenBSD install image is available locally
-    if [ ! -f install"${openbsd_version_short}".img ];
+    if [ ! -f install"${openbsd_version_short}".img ]
     then
         printf "%b %bINFO:%b  Downloading the OpenBSD image file.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
         if ! curl --progress-bar \
@@ -51,17 +51,18 @@ check_openbsd_install_image ()
         fi
     fi
     # Check the sha256 checksum against the online availlable checksum at cdn.openbsd.org
-    if ! install_sha256_locally="$(sha256sum "install${openbsd_version_short}.img" | cut -d " " -f 1)";
+    if ! install_sha256_locally="$(sha256sum "install${openbsd_version_short}.img" | cut -d " " -f 1)"
     then
         printf "%b %bERROR:%b Checking the checksum of the local install image did not succeed.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
         exit 12
     fi
-    if ! install_sha256_online="$(curl --silent https://cdn.openbsd.org/pub/OpenBSD/${url_path}/arm64/SHA256 | grep "install${openbsd_version_short}.img" | cut -d " " -f 4)";
+    if ! install_sha256_online="$(curl --silent https://cdn.openbsd.org/pub/OpenBSD/${url_path}/arm64/SHA256 | grep "install${openbsd_version_short}.img" | cut -d " " -f 4)"
     then
         printf "%b %bERROR:%b Downloading the checksum of the install image did not succeed.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
         exit 13
     fi
-    if [ "${install_sha256_locally}" != "${install_sha256_online}" ]; then
+    if [ "${install_sha256_locally}" != "${install_sha256_online}" ]
+    then
         printf "%b %bERROR:%b The sha256 checksum of the local \"install%b.img\" is not correct.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}" "${openbsd_version_short}" 
         printf "%b %bERROR:%b It is supposed to be: %b.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}" "${install_sha256_online}"
         printf "%b %bERROR:%b Do you want me to delete the local install img file? [Y\\\\n]: " "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
@@ -73,9 +74,9 @@ check_openbsd_install_image ()
 #        else
             read -r answer
 #        fi
-        if [ "${answer}" = "" ] || [ "${answer}" = "Y" ] || [ "${answer}" = "y" ];
+        if [ "${answer}" = "" ] || [ "${answer}" = "Y" ] || [ "${answer}" = "y" ]
         then
-            if ! rm -rf install*.img;
+            if ! rm -rf install*.img
             then
                 printf "%b %bERROR:%b The install img file could not be deleted.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
                 printf "%b %bERROR:%b Please try to delete it manually.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
@@ -94,7 +95,7 @@ check_openbsd_install_image ()
 }
 
 # Evaluating the command line options\n"
-#if ! . ./getoptions.sh;
+#if ! . ./getoptions.sh
 #then
 #    printf "%b %bERROR:%b sourcing the getoptions.sh was not possible.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
 #    exit 1
@@ -106,7 +107,7 @@ check_openbsd_install_image ()
 #    flag  ANSWER_YES -y --yes  init:="$default_answer_yes" -- "myText"
 #    disp  :usage     -h --help
 #}
-#if ! getoptions parser_definition parse;
+#if ! getoptions parser_definition parse
 #then
 #    printf "%b %bERROR:%b parsing the options was not possible.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
 #    exit 3
@@ -117,21 +118,21 @@ check_openbsd_install_image ()
 printf "################################################################################\n"
 printf "# Checking if there is still a vmware-vmx process left over from the last run\n"
 printf "################################################################################\n"
-if (ps aux | grep "vmware-vmx" | grep "VMware Fusion.app");
+if (ps aux | grep "vmware-vmx" | grep "VMware Fusion.app")
 then
     printf "%b %bINFO:%b  There are still running vmware-vmx processes.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
     printf "%b %bINFO:%b  Do want me to kill it/them? [Y\\\\n]: " "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
     # Check if the --yes option was passed as command line option
-#    if [ "${ANSWER_YES}" = "1" ];
+#    if [ "${ANSWER_YES}" = "1" ]
 #    then
 #        answer="y"
 #        printf "\n"
 #    else
         read -r answer
 #    fi
-    if [ "${answer}" = "" ] || [ "${answer}" = "Y" ] || [ "${answer}" = "y" ];
+    if [ "${answer}" = "" ] || [ "${answer}" = "Y" ] || [ "${answer}" = "y" ]
     then
-        if ! pkill vmware-vmx;
+        if ! pkill vmware-vmx
         then
             printf "%b %bERROR:%b The vmware-vmx process could not be killed successfully.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
             printf "%b %bERROR:%b Please check this manually, kill it and than rerun this script again.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
@@ -151,15 +152,15 @@ i=0
 while [ "${i}" -lt "${max_tries_port_check}" ]
 do
     checked_ports=$(netstat -lnv | grep "127.0.0.1.${packer_vnc_port}" && (lsof -i -P 2>/dev/null | grep "localhost:${packer_vnc_port}"))
-    if [ "${checked_ports}" = "" ];
+    if [ "${checked_ports}" = "" ]
     then
-        if [ "${i}" != "0" ];
+        if [ "${i}" != "0" ]
         then
             printf "\n"
         fi
         break
     fi
-    if [ "${i}" = "0" ];
+    if [ "${i}" = "0" ]
     then
         printf "%b %bINFO:%b  Please make sure that all packer and VNC Viewer processes are closed.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
         printf "%b %bINFO:%b  ." "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
@@ -169,7 +170,7 @@ do
     i=$(( i + 1 ))
     sleep 1
 done
-if [ "${i}" -lt "${max_tries_port_check}" ];
+if [ "${i}" -lt "${max_tries_port_check}" ]
 then
     printf "%b %bINFO:%b  There are no running packer and VNC Viewer processes anymore.\n\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
 else
@@ -183,55 +184,55 @@ printf "########################################################################
 printf "# Checking the software prerequisites\n"
 printf "################################################################################\n"
 # MacOS running on Apple silicon
-if [ "$(uname -o) $(uname -m)" != "Darwin arm64" ];
+if [ "$(uname -o) $(uname -m)" != "Darwin arm64" ]
 then
     printf "%b %bERROR:%b This script is only working on MacOS running on Apple Silicon.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     exit 5
 fi
 # Check if homebrew is installed (QUESTION: Is homebrew really required???)
-if ! which brew > /dev/null 2>&1;
+if ! which brew > /dev/null 2>&1
 then
     printf "%b %bERROR:%b Please install homebrew.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     printf "%b %bERROR:%b More infos at https://brew.sh\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     exit 6
 fi
 # Check if curl is available on the system (it is included in the MacOS default installation)
-if ! which curl > /dev/null 2>&1;
+if ! which curl > /dev/null 2>&1
 then
     printf "%b %bERROR:%b curl is not available on this system.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     printf "%b %bERROR:%b Please install curl (brew install curl).\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     exit 7
 fi
 # Check if sha256sum is available on the system
-if ! which sha256sum > /dev/null 2>&1;
+if ! which sha256sum > /dev/null 2>&1
 then
     printf "%b %bERROR:%b sha256sum is not available on this system.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     printf "%b %bERROR:%b Please install sha256sum (brew install coreutils).\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     exit 8
 fi
 # Check if qemu-img is installed
-if ! which qemu-img > /dev/null 2>&1;
+if ! which qemu-img > /dev/null 2>&1
 then
     printf "%b %bERROR:%b qemu-img is not available on this system.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     printf "%b %bERROR:%b Please install qemu (brew install qemu).\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     exit 9
 fi
 # Check if packer is installed (the packer version will be checked in the pkr.hcl script)
-if ! which packer > /dev/null 2>&1;
+if ! which packer > /dev/null 2>&1
 then
     printf "%b %bERROR:%b packer is not available on this system.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     printf "%b %bERROR:%b Please install packer (brew install packer).\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     exit 10
 fi
 # Check if VMware Fusion is installed (at least the version 13 that supports arm64 VMs)
-if ! brew list | grep vmware-fusion > /dev/null 2>&1;
+if ! brew list | grep vmware-fusion > /dev/null 2>&1
 then
     printf "%b %bERROR:%b vmware-fusion is not available on this system.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     printf "%b %bERROR:%b Please install vmware-fusion (brew install vmware-fusion).\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     exit 11
 fi
 # Check if vmrun is accessible
-if ! which vmrun > /dev/null 2>&1;
+if ! which vmrun > /dev/null 2>&1
 then
     printf "%b %bERROR:%b vmrun is not accessible on this system. Make sure VMware Fusion is installed correctly.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     printf "%b %bERROR:%b Please install vmware-fusion (brew install vmware-fusion).\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
@@ -247,7 +248,7 @@ if ! rm -rf output-* \
             ./*.vmdk \
             empty.iso \
             log/* \
-            > /dev/null 2>&1;
+            > /dev/null 2>&1
 then
     printf "%b %bERROR:%b Cleanup of directories and files did not succeed.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     exit 13
@@ -257,7 +258,7 @@ printf "%b %bINFO:%b  The local directories have been cleaned up.\n\n" "$(date "
 printf "################################################################################\n"
 printf "# Make sure the OpenBSD arm64 install image is available locally\n"
 printf "################################################################################\n"
-if ! check_openbsd_install_image;
+if ! check_openbsd_install_image
 then
     check_openbsd_install_image
 fi
@@ -265,7 +266,7 @@ fi
 printf "################################################################################\n"
 printf "# Convert the current OpenBSD install image to a vmdk file\n"
 printf "################################################################################\n"
-if ! qemu-img convert install"${openbsd_version_short}".img -O vmdk install"${openbsd_version_short}".vmdk > /dev/null 2>&1;
+if ! qemu-img convert install"${openbsd_version_short}".img -O vmdk install"${openbsd_version_short}".vmdk > /dev/null 2>&1
 then
     printf "%b %bERROR:%b Coverting the OpenBSD install image did not succeed.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     exit 14
@@ -276,7 +277,7 @@ printf "########################################################################
 printf "# Creating an empty (dummy) ISO image required by packer\n"
 printf "################################################################################\n"
 
-if ! (touch tmp && dd if=tmp of=empty.iso && rm -rf tmp) > /dev/null 2>&1;
+if ! (touch tmp && dd if=tmp of=empty.iso && rm -rf tmp) > /dev/null 2>&1
 then
     printf "%b %bERROR:%b Creating an empty ISO file did not succeed.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     exit 15
@@ -286,7 +287,7 @@ printf "%b %bINFO:%b  The dummy file empty.iso was successfully created.\n\n" "$
 printf "################################################################################\n"
 printf "# Validating the packer configuration file\n"
 printf "################################################################################\n"
-if ! packer validate "${packer_config_file_name}";
+if ! packer validate "${packer_config_file_name}"
 then
     printf "%b %bERROR:%b Validating the packer packer configuration file did not succed.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     exit 16
@@ -296,7 +297,7 @@ printf "%b %bINFO:%b  The packer configuration was successfully validated.\n\n" 
 printf "################################################################################\n"
 printf "# Initializing packer and get the required plugins\n"
 printf "################################################################################\n"
-if ! packer init "${packer_config_file_name}" > /dev/null 2>&1;
+if ! packer init "${packer_config_file_name}" > /dev/null 2>&1
 then
     printf "%b %bERROR:%b Initializing packer did not succed.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     exit 17
@@ -318,7 +319,7 @@ if ! packer build -force \
                   -var openbsd-username="${openbsd_username}" \
                   -var openbsd-excluded-sets="${openbsd_excluded_sets}" \
                   -var rc-firsttime-wait="${rc_firsttime_wait}" \
-                  "${packer_config_file_name}" > /dev/null 2>&1;
+                  "${packer_config_file_name}"
 then
     printf "%b %bERROR:%b Building the OpenBSD VM did not succed.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
     printf "%b %bERROR:%b You can check the log file in the log directory.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
