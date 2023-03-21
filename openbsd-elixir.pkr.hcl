@@ -12,14 +12,6 @@ variable "packer-boot-wait" {
   type    = string
   default = "25"
 }
-variable "packer-ssh-host" {
-  type    = string
-  default = "openbsd-elixir"
-}
-variable "packer-vnc-port" {
-  type    = string
-  default = "5987"
-}
 variable "use-openbsd-snapshot" {
   type    = bool
   default = "false"
@@ -63,8 +55,6 @@ source "vmware-iso" "openbsd-elixir" {
   iso_checksum         = "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   ssh_username         = "user"
   ssh_password         = "user"
-  vnc_port_min         = "${var.packer-vnc-port}"
-  vnc_port_max         = "${var.packer-vnc-port}"
   vnc_disable_password = "true"
   shutdown_command     = "doas /sbin/shutdown -p now"
   keep_registered      = "false"
@@ -152,7 +142,7 @@ build {
   provisioner "shell" {
     pause_before     = "10s"
     inline = [
-      "doas pkg_add ${var.use-openbsd-snapshot == "false" ? "" : "-D snapshot "}elixir postgresql-server curl",
+      "doas pkg_add ${var.use-openbsd-snapshot == "false" ? "" : "-D snapshot "}elixir postgresql-server curl python-3.11.2",
       "cd /var/postgresql/ && doas su _postgresql -c \"initdb --pgdata=/var/postgresql/data/ --username=postgres --encoding=UTF-8 --locale=en_US.UTF-8\"",
       "doas rcctl enable postgresql && doas rcctl start postgresql",
     ]
