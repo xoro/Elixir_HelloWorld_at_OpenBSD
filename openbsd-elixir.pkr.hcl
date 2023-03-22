@@ -30,7 +30,7 @@ variable "openbsd-username" {
 }
 variable "openbsd-excluded-sets" {
   type    = string
-  default = "-g* -x*"
+  default = "-g* -m* -x*"
 }
 variable "rc-firsttime-wait" {
   type    = string
@@ -143,6 +143,9 @@ build {
     pause_before     = "10s"
     inline = [
       "doas pkg_add ${var.use-openbsd-snapshot == "false" ? "" : "-D snapshot "}elixir postgresql-server curl python-3.11.2",
+      "pip3.11 install --disable-pip-version-check robotframework==6.0.2",
+      "pip3.11 install --disable-pip-version-check robotframework-requests==0.9.4",
+      "pip3.11 install --disable-pip-version-check robotframework-jsonlibrary==0.5",
       "cd /var/postgresql/ && doas su _postgresql -c \"initdb --pgdata=/var/postgresql/data/ --username=postgres --encoding=UTF-8 --locale=en_US.UTF-8\"",
       "doas rcctl enable postgresql && doas rcctl start postgresql",
     ]
