@@ -18,15 +18,11 @@ variable "use-openbsd-snapshot" {
 }
 variable "openbsd-install-img" {
   type    = string
-  default = "install72.img"
+  default = "install73.img"
 }
 variable "openbsd-hostname" {
   type    = string
   default = "openbsd-elixir"
-}
-variable "openbsd-username" {
-  type    = string
-  default = "user"
 }
 variable "openbsd-excluded-sets" {
   type    = string
@@ -53,8 +49,8 @@ source "vmware-iso" "openbsd-elixir" {
   version              = "20"
   iso_url              = "./empty.iso"
   iso_checksum         = "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-  ssh_username         = "user"
-  ssh_password         = "user"
+  ssh_username         = "root"
+  ssh_password         = "root"
   vnc_disable_password = "true"
   shutdown_command     = "doas /sbin/shutdown -p now"
   keep_registered      = "false"
@@ -76,7 +72,6 @@ source "vmware-iso" "openbsd-elixir" {
     # We need the USB stuff for packer to type text.
     "usb_xhci.present" = "TRUE"
     # We have to add the vmdk converted OpenBSD install image file,
-    "nvme0.present"    = "TRUE"
     "nvme0:1.fileName" = "${var.openbsd-install-img}"
     "nvme0:1.present"  = "TRUE"
     # and make sure to boot from it.
@@ -95,12 +90,10 @@ source "vmware-iso" "openbsd-elixir" {
     "root<return><wait2s>",
     "root<return><wait2s>",
     "yes<return><wait2s>",
-    "${var.openbsd-username}<return><wait2s>",
-    "${var.openbsd-username}<return><wait2s>",
-    "${var.openbsd-username}<return><wait2s>",
-    "${var.openbsd-username}<return><wait2s>",
     "no<return><wait2s>",
+    "yes<return><wait2s>",
     "<return><wait2s>",
+    "no<return><wait2s>",
     "?<return><wait2s>",
     "sd0<return><wait2s>",
     "whole<return><wait2s>",
@@ -119,10 +112,6 @@ source "vmware-iso" "openbsd-elixir" {
     "reboot<return><wait${var.rc-firsttime-wait}s>",
     "root<return><wait2s>",
     "root<return><wait3s>",
-    "cp /etc/examples/doas.conf /etc/<return><wait2s>",
-    # For an easier system update we allow the :wheel user to access all command without password.
-    # We will restrict this in the last builder step again.
-    "echo 'permit nopass :wheel as root' >> /etc/doas.conf<return><wait2s>",
     "exit<return><wait2s>",
   ]
 }

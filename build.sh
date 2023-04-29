@@ -112,32 +112,32 @@ check_openbsd_install_image()
 #parse "$@"
 #eval "set -- $REST"
 
-printf "################################################################################\n"
-printf "# Checking if there is still a vmware-vmx process left over from the last run\n"
-printf "################################################################################\n"
-if (ps aux | grep "vmware-vmx" | grep "VMware Fusion.app"); then
-    printf "%b %bINFO:%b  There are still running vmware-vmx processes.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
-    printf "%b %bINFO:%b  Do want me to kill it/them? [Y\\\\n]: " "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
-    # Check if the --yes option was passed as command line option
-    #    if [ "${ANSWER_YES}" = "1" ]
-    #    then
-    #        answer="y"
-    #        printf "\n"
-    #    else
-        read -r answer
-    #    fi
-    if [ "${answer}" = "" ] || [ "${answer}" = "Y" ] || [ "${answer}" = "y" ]; then
-        if ! pkill vmware-vmx; then
-            printf "%b %bERROR:%b The vmware-vmx process could not be killed successfully.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
-            printf "%b %bERROR:%b Please check this manually, kill it and than rerun this script again.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
-            exit 4
-        else
-            printf "%b %bINFO:%b  All vmware-vmx processes have been killed successfully.\n\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
-        fi
-    fi
-else
-    printf "%b %bINFO:%b  There is no running vmware-vmx process related to this script.\n\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
-fi
+#printf "################################################################################\n"
+#printf "# Checking if there is still a vmware-vmx process left over from the last run\n"
+#printf "################################################################################\n"
+#if (ps aux | grep "vmware-vmx" | grep "VMware Fusion.app"); then
+#    printf "%b %bINFO:%b  There are still running vmware-vmx processes.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
+#    printf "%b %bINFO:%b  Do want me to kill it/them? [Y\\\\n]: " "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
+#    # Check if the --yes option was passed as command line option
+#    #    if [ "${ANSWER_YES}" = "1" ]
+#    #    then
+#    #        answer="y"
+#    #        printf "\n"
+#    #    else
+#        read -r answer
+#    #    fi
+#    if [ "${answer}" = "" ] || [ "${answer}" = "Y" ] || [ "${answer}" = "y" ]; then
+#        if ! pkill vmware-vmx; then
+#            printf "%b %bERROR:%b The vmware-vmx process could not be killed successfully.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
+#            printf "%b %bERROR:%b Please check this manually, kill it and than rerun this script again.\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_red_bold}" "${fmt_end}"
+#            exit 4
+#        else
+#            printf "%b %bINFO:%b  All vmware-vmx processes have been killed successfully.\n\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
+#        fi
+#    fi
+#else
+#    printf "%b %bINFO:%b  There is no running vmware-vmx process related to this script.\n\n" "$(date "+%Y-%m-%d %H:%M:%S")" "${fmt_bold}" "${fmt_end}"
+#fi
 
 printf "################################################################################\n"
 printf "# Checking the software prerequisites\n"
